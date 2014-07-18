@@ -1,0 +1,168 @@
+ #slider{
+  /*width:569px;*/
+  width:748px;
+  margin-top:50px;
+  display: inline-block;
+  float: left;
+  position: relative;
+  margin-left:50px;
+}
+.sundayCircleBox{
+  display:inline-block;
+  position:absolute;
+  height:6px;
+}
+.sundayCircle{
+  display:inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 6px;
+  position: absolute;
+  left: -6px;
+  background-color: #8cbecd;
+  top:2px;
+}
+.sundayTag{
+  color: white;
+  font-size: 12px;
+  position: absolute;
+  color:#8cbecd;
+  bottom: -27px;
+}
+.lastSunday .sundayCircleBox{
+  right:0;
+}
+.lastSunday .sundayCircle{
+  left:-5px;
+  right:-6px;
+}
+.rangeSlider-arrow{
+  display: inline-block;
+  position: relative;
+  margin-left:15px;
+  float: left;
+  padding-top: 40px;
+  width:58px;
+  left: 569px;
+  top: -10px;
+  padding: 0;
+}
+.arrow{
+  background: url(image/leftRightButton.png) no-repeat;
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  margin:5px 2px 0 2px;
+  top:-15px;
+  cursor: pointer;
+}
+.rightArrow{
+
+  left:-20px;
+  background-position: -25px -24px;
+}
+.leftArrow{
+
+  right: -40px;
+  background-position: -25px 0px;
+}
+.wrap{
+  display: inline-block;
+}
+#selectionWrap{
+  position: relative;
+  height:66px;
+  padding-left:7px;
+  left: 568px;
+  padding-top: 0;
+  top: -4px;
+}
+#selectionWrap select{
+  /*position: absolute;*/
+  right:-60px;
+}
+.barWrap{
+  position:absolute;
+  height:9px;
+  top:0;
+  left:0;
+}
+.bar{
+  height:3px;
+  position: absolute;
+  /*background-color: #e8d66a;*/
+  bottom: -6px;
+  cursor: pointer;
+  z-index: 98;
+  padding: 6px 0;
+}
+.bar-inner{
+  background-color: #e8d66a;
+  height:3px;
+}
+.handle{
+  height:11px;
+  width:11px;
+  /*border-radius: 6px;*/
+  position: absolute;
+  /*background-color: #e8d66a;*/
+  bottom: -4px;
+  cursor: pointer;
+  z-index: 99;
+}
+.handle-inner{
+  height:11px;
+  width:11px;
+  border-radius: 6px;
+  background-color: #e8d66a;
+}
+.handle-label{
+  background-color: #8cbecd;
+  width:44px;
+  height:21px;
+  position: absolute;
+  top:-40px;
+  left: -16px;
+  border-radius: 2px;
+}
+.label-triangle{
+  border: 7px solid transparent;
+  border-bottom: 0px;
+  border-top: 6px solid #8cbecd;
+  position: absolute;
+  bottom: -6px;
+  left: 15px;
+}
+.label-value{
+  height:9px;
+  width:34px;
+  padding: 4px 5px;
+  color: #fff;
+  text-align:center;
+  font-size:12px;
+}
+.handle-label{
+  display: none;
+}
+.arrowIsHovering{
+  width: 17px;
+  height: 17px;
+  background:url(image/red-pot.png);
+  position: absolute;
+  left:-3px;
+  top:-3px;
+}
+.block{
+  float: left;
+}
+#scaleWarp{
+  position: absolute;
+}
+#rangeWrap{
+  position: absolute;
+  display: block;
+  width: 100%;
+  height:6px;
+  top: 6px;
+  left:0;
+}

@@ -1,0 +1,852 @@
+<!DOCTYPE>
+  <html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Range</title>
+    <link rel="stylesheet" href="style/style.css" type="text/css" />
+    <style type="text/css">
+      #slider{
+        /*width:569px;*/
+        width:748px;
+        margin-top:50px;
+        display: inline-block;
+        float: left;
+        position: relative;
+        margin-left:50px;
+      }
+      .sundayCircleBox{
+        display:inline-block;
+        position:absolute;
+        height:6px;
+      }
+      .sundayCircle{
+        display:inline-block;
+        width: 11px;
+        height: 11px;
+        border-radius: 6px;
+        position: absolute;
+        left: -6px;
+        background-color: #8cbecd;
+        top:2px;
+      }
+      .sundayTag{
+        color: white;
+        font-size: 12px;
+        position: absolute;
+        color:#8cbecd;
+        bottom: -27px;
+      }
+      .lastSunday .sundayCircleBox{
+        right:0;
+      }
+      .lastSunday .sundayCircle{
+        left:-5px;
+        right:-6px;
+      }
+      .rangeSlider-arrow{
+        display: inline-block;
+        position: relative;
+        margin-left:15px;
+        float: left;
+        padding-top: 40px;
+        width:58px;
+        left: 569px;
+        top: -10px;
+        padding: 0;
+      }
+      .arrow{
+        background: url(image/leftRightButton.png) no-repeat;
+        width: 25px;
+        height: 25px;
+        display: inline-block;
+        margin:5px 2px 0 2px;
+        top:-15px;
+        cursor: pointer;
+      }
+      .rightArrow{
+  
+        left:-20px;
+        background-position: -25px -24px;
+      }
+      .leftArrow{
+      
+        right: -40px;
+        background-position: -25px 0px;
+      }
+      .wrap{
+        display: inline-block;
+      }
+      #selectionWrap{
+        position: relative;
+        height:66px;
+        padding-left:7px;
+        left: 568px;
+        padding-top: 0;
+        top: -4px;
+      }
+      #selectionWrap select{
+        /*position: absolute;*/
+        right:-60px;
+      }
+      .barWrap{
+        position:absolute;
+        height:9px;
+        top:0;
+        left:0;
+      }
+      .bar{
+        height:3px;
+        position: absolute;
+        /*background-color: #e8d66a;*/
+        bottom: -6px;
+        cursor: pointer;
+        z-index: 98;
+        padding: 6px 0;
+      }
+      .bar-inner{
+        background-color: #e8d66a;
+        height:3px;
+      }
+      .handle{
+        height:11px;
+        width:11px;
+        /*border-radius: 6px;*/
+        position: absolute;
+        /*background-color: #e8d66a;*/
+        bottom: -4px;
+        cursor: pointer;
+        z-index: 99;
+      }
+      .handle-inner{
+        height:11px;
+        width:11px;
+        border-radius: 6px;
+        background-color: #e8d66a;
+      }
+      .handle-label{
+        background-color: #8cbecd;
+        width:44px;
+        height:21px;
+        position: absolute;
+        top:-40px;
+        left: -16px;
+        border-radius: 2px;
+      }
+      .label-triangle{
+        border: 7px solid transparent;
+        border-bottom: 0px;
+        border-top: 6px solid #8cbecd;
+        position: absolute;
+        bottom: -6px;
+        left: 15px;
+      }
+      .label-value{
+        height:9px;
+        width:34px;
+        padding: 4px 5px;
+        color: #fff;
+        text-align:center;
+        font-size:12px;
+      }
+      .handle-label{
+        display: none;
+      }
+      .arrowIsHovering{
+        width: 17px;
+        height: 17px;
+        background:url(image/red-pot.png);
+        position: absolute;
+        left:-3px;
+        top:-3px;
+      }
+      .block{
+        float: left;
+      }
+      #scaleWarp{
+        position: absolute;
+      }
+      #rangeWrap{
+        position: absolute;
+        display: block;
+        width: 100%;
+        height:6px;
+        top: 6px;
+        left:0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="slider"></div>
+    <script src="js/jquery.min.js"></script>
+    <script>
+      (function( $ , undefined ){
+
+        var timeline = function(param) {
+
+          var parent = param.parent || $('body'),
+              // dateArr = [],
+              _dateArr = [],
+              barBeginLength = param.barBeginLength || 6,
+              leftDateIndex = 0,
+              rightDateIndex = barBeginLength,
+              selectionChange = param.selectionChange || function(){},
+              barChange = param.barChange || function(){},
+              selectionStartDate = param.selectionStartDate || new Date(),
+              selectionEndDate = param.selectionEndDate || new Date(),
+              today = new Date();
+
+
+          var createButton = function(parent){
+            var parent = parent ? parent : $('body');
+            parent.append('<div id="rangeSlider-arrow" class="rangeSlider-arrow"></div>');
+            var arrowBox = $("#rangeSlider-arrow"),
+                leftArrowStr = '<div class="arrow leftArrow"></div>',
+                rightArrowStr = '<div class="arrow rightArrow"></div>';
+            arrowBox.append(rightArrowStr + leftArrowStr);  
+          }
+
+          var createSelection = function(parent,optionData){
+
+            var parent = parent ? parent : $('body');
+
+            parent.append('<div id="selectionWrap" class="wrap"></div>');
+            $('#selectionWrap').append('<select id="dateSelection"></select>');
+
+            var dateSelection = $('#dateSelection');
+
+            if( optionData && optionData.length){
+              // console.log(optionData);
+              var arrLength = optionData.length;
+              for(var index = 0 ; index < arrLength ; index++){
+                dateSelection.append('<option value="'+ optionData[index].value +'">'+ optionData[index].text + '</option>');
+              }
+            }
+          }
+          
+          var renderBaseLine = function( parentNode , height , bgColor){
+
+            parentNode.append('<div id="rangeWrap" style=" display:inline-block;width:'+ (parentNode.width() - 179) +'px;"></div>');
+            $('#rangeWrap').append('<div class="baseLine" style="height:'+ height +'px; background-color:'+ bgColor +';"></div>');
+            return;
+          }
+         
+          var renderRuler = function( start , end , parentNode , model){
+
+            var parentLength = parentNode.width() - 179,
+                sundayArr = getSundays(start,end),
+                // startDate = start,
+                // endDate = end,
+                dateArr = [],
+                dateNum = '';
+
+            if( !model || model != 'year'){
+              dateNum = (end.valueOf() - start.valueOf()) / (24 * 60 * 60 * 1000);
+            } else {
+              dateNum = 24;
+            }
+
+            var eachBlockWidth = ( parentLength - dateNum - 1)/ dateNum,
+                enabledBlockStr = '<div class="block" style="width:'+ eachBlockWidth +'px;border-left:1px solid #8cbecd; height:6px; display:inline-block; position:relative;"></div>',
+                // disabledBlockStr = '<div class="block" style="width:'+ eachBlockWidth +'px;margin-left:1px;height:6px; display:inline-block; position:relative;"></div>',
+                sundayPot = '<div class="block sundayNode" style="width:'+ 
+                  eachBlockWidth +'px;height:6px; display:inline-block; position:relative; margin-left:1px;">'+
+                  '<div class="sundayCircleBox">'+
+                  '<div class="sundayCircle"></div>'+
+                  '<div class="sundayTag"></div>'+
+                  '</div></div>',
+                noSundayLastBlock = '<div class="block lastBlock" style="width:'+ eachBlockWidth +'px;border-left:1px solid #8cbecd;border-right:1px solid #8cbecd; height:6px; display:inline-block; position:relative;"></div>',
+                rightSundayLastBlock = '<div class="block sundayNode lastBlock lastSunday" style="width:'+ 
+                  eachBlockWidth +'px;height:6px; display:inline-block; position:relative; border-left: 1px solid #8cbecd;">'+
+                  '<div class="sundayCircleBox">'+
+                  '<div class="sundayCircle"></div>'+
+                  '<div class="sundayTag"></div>'+
+                  '</div></div>',
+                leftSundayLastBlock = '<div class="block sundayNode lastBlock" style="width:'+ 
+                  eachBlockWidth +'px;height:6px; display:inline-block; position:relative; margin-left:1px; border-right:1px solid #8cbecd;">'+
+                  '<div class="sundayCircleBox">'+
+                  '<div class="sundayCircle"></div>'+
+                  '<div class="sundayTag"></div>'+
+                  '</div></div>',
+                rightSundayLastBlockNoLeftBorder = '<div class="block sundayNode lastBlock lastSunday" style="width:'+ 
+                  eachBlockWidth +'px;height:6px; display:inline-block; position:relative;">'+
+                  '<div class="sundayCircleBox">'+
+                  '<div class="sundayCircle"></div>'+
+                  '<div class="sundayTag"></div>'+
+                  '</div></div>',
+                blockStr = '';
+
+            if( $("#scaleWarp").length != 0){
+              $("#scaleWarp").empty();
+            }
+
+            if( !$("#scaleWarp").length ){
+              parentNode.append('<div id="scaleWarp"></div>');
+            }
+
+            if( !model || model != 'year'){
+
+                for( var i = start.valueOf(), sunDayIndex = 0, index = 0; i < end.valueOf() - 24 * 60 * 60 * 1000; i += 24 * 60 * 60 * 1000, index++){
+        
+                  if(  sunDayIndex < sundayArr.length && i == sundayArr[sunDayIndex].valueOf()){
+                    blockStr += sundayPot;
+                    sunDayIndex++;
+                  } else {
+                    blockStr += enabledBlockStr;
+                  }
+                  dateArr.push(
+                    {
+                      location:{
+                        x: eachBlockWidth * index + index + 1
+                      },
+                      date: i,
+                      width: eachBlockWidth
+                    }
+                  );
+                }
+
+                //处理最后一个区间的数据
+                dateArr.push(
+                  {
+                    location:{
+                      x: eachBlockWidth * dateArr.length + dateArr.length + 1
+                    },
+                    date: dateArr[dateArr.length - 1].date + 24 * 60 * 60 * 1000,
+                    width: eachBlockWidth
+                  }
+                );
+                dateArr.push(
+                  {
+                    location:{
+                      x: eachBlockWidth * dateArr.length + dateArr.length + 1
+                    },
+                    date: dateArr[dateArr.length - 1].date + 24 * 60 * 60 * 1000,
+                    width: eachBlockWidth
+                  }
+                );
+
+                // $("#scaleWarp").append("<div class="">")
+                $("#scaleWarp").append(blockStr);
+                //最后一个日期特别处理
+                if(isSunday(end)){
+                  $("#scaleWarp").append(rightSundayLastBlock);
+                } else if(isSunday(new Date(end.valueOf() - 24 * 60 * 60 * 1000))){
+                  $("#scaleWarp").append(leftSundayLastBlock);
+                }
+                else{
+                  $("#scaleWarp").append(noSundayLastBlock);
+                }
+
+                //处理每个圆点下面的日期
+                var sundayTagArr = $(".sundayTag"),
+                    sundayTagNum = sundayTagArr.length;
+                    //console.log(sundayTagArr[0].text());
+            
+                if(sundayTagArr.length !== 0){
+                  for(var index = 0 ; index < sundayTagNum ; index++){
+                    var tempObj = $(sundayTagArr[index]);
+                    tempObj.html(sundayArr[index].getMonth() + 1 + '.' + sundayArr[index].getDate());
+                    tempObj.css('left' , -tempObj.width() / 2);
+                  }
+                }
+
+            } else {
+
+              for( var index = 0 , i = 0; index < 12 ; index++,i += 2){
+                if( index != 11){
+                  blockStr += sundayPot + enabledBlockStr;
+                } else {
+                  blockStr += sundayPot + rightSundayLastBlock;
+                }
+
+                dateArr.push(
+                  {
+                    location:{
+                      x: eachBlockWidth * i + i + 1
+                    },
+                    date: (new Date(start.getFullYear(),start.getMonth() + index , 1)).valueOf(),
+                    width: eachBlockWidth
+                  }
+                );
+                dateArr.push(
+                  {
+                    location:{
+                      x: eachBlockWidth * (i + 1) + i + 1
+                    },
+                    date: (new Date(start.getFullYear(),start.getMonth() + index , new Date(start.getFullYear(),start.getMonth() + 1 , 0).getDate() / 2)).valueOf(),
+                    width: eachBlockWidth
+                  }
+                );
+              }
+
+              //处理最后一个日期
+              dateArr.push(
+                {
+                  location:{
+                    x: eachBlockWidth * 24 + 24
+                  },
+                  date: (new Date(start.getFullYear(),11 , new Date(start.getFullYear() + 1, 1 ,0).getDate())).valueOf(),
+                  width: eachBlockWidth
+                }
+              );
+
+              $("#scaleWarp").append(blockStr);
+              //处理每个圆点下面的日期
+              var sundayTagArr = $(".sundayTag"),
+                  sundayTagNum = sundayTagArr.length;
+
+              // console.log(sundayTagArr);
+              for(var index = 0 , i  = 0 ; index < dateArr.length ; index +=2, i++){
+                var tempObj = $(sundayTagArr[i]);
+                tempObj.html((new Date(dateArr[index].date)).getMonth() + 1 + '.' + (new Date(dateArr[index].date)).getDate());
+                tempObj.css('left' , -tempObj.width() / 2);
+              }
+              
+            }
+            return dateArr;
+          }
+
+          var renderBar = function(start , end , parent){
+
+              var barWrapStr = '<div class="wrap barWrap"></div>',
+                  leftHandleStr = '<div class="handle leftHandle" id="leftHandle">' +
+                                      '<div class="handle-label leftHandle-label">' +
+                                          '<div class="label-value leftHandle-label-value"></div>' +
+                                          '<div class="label-inner leftHandle-label-inner"></div>' +
+                                          '<div class="label-triangle leftHandle-label-triangle"></div>' +
+                                      '</div>' +
+                                      '<div class="handle-inner leftHandle-inner">' +
+                                      '</div>' +
+                                  '</div>',
+                  rightHandleStr = '<div class="handle rightHandle" id="rightHandle">' +
+                                      '<div class="handle-label rightHandle-label">' +
+                                          '<div class="label-value rightHandle-label-value"></div>' +
+                                          '<div class="label-inner rightHandle-label-inner"></div>' +
+                                          '<div class="label-triangle rightHandle-label-triangle"></div>' +
+                                      '</div>' +
+                                      '<div class="handle-inner rightHandle-inner">' +
+                                      '</div>' +
+                                    '</div>',
+                  barStr = '<div class="bar" id="bar"><div class="bar-inner"></div></div>',
+                  parent = parent ? parent : $('body'),
+                  barWrap = $(barWrapStr);
+
+              if($(".barWrap").length === 0){
+                barWrap.append(leftHandleStr + barStr + rightHandleStr);
+                parent.append(barWrap);
+              }
+              var leftHandle = $(".barWrap #leftHandle"),
+                  rightHandle = $(".barWrap #rightHandle"),
+                  bar = $(".barWrap #bar");
+
+              leftHandle.css('left',start - 6 + 'px');
+              rightHandle.css('left',end - 6 + 'px');
+              bar.css({ left:start + 'px',width: (end - start) + 'px'});
+              barChange(_dateArr[leftDateIndex].date,_dateArr[rightDateIndex].date);
+          } 
+
+          var isSunday = function( date ){
+            return !(date.getDay());
+          }
+
+          var getSundays = function( begin , end ){
+            // var firstDay = (new Date( year , month - 1 )).getDay(),
+            var beginDay = begin.getDay(),
+                beginDate =begin.getDate(),
+                beginMilliSecond = begin.valueOf(),
+                endMilliSecond = end.valueOf(),
+                oneDayMilliSecond = 24 * 60 * 60 * 1000;
+                // endDay = begin.getDay(),
+                sundayArr = new Array();
+                // monthDays = (new Date( year , month - 1 , 0)).getDate();
+            for(var i = beginMilliSecond + (( beginDay != 0 ? (6 - beginDay + 1) : 0) * oneDayMilliSecond); i <= endMilliSecond ; i += 7 * oneDayMilliSecond){
+              sundayArr.push(new Date(i));
+            }
+            return sundayArr;
+          }
+
+          var getMaxDay = function ( date ){
+            var thisDate = date ? date : new Date();
+            return new Date( thisDate.getFullYear(),thisDate.getMonth(),0 );
+          }
+
+
+          var bindEvent = function(dateArr){
+
+           var  isMouseDown = false,
+                mainHandle = null,
+                handleId = null,
+                mouseLastLocation = 0,
+                bardiff = 0,
+                // _dateArr = dateArr,
+                dateArrLength = _dateArr.length,
+                // anotherHandle = handleId == 'rightHandle' ? $('#leftHandle') : $('#rightHandle'),
+                bar = $("#bar"),
+                leftHandle = $("#leftHandle"),
+                rightHandle = $("#rightHandle"),
+                // leftDateIndex = 0,
+                // rightDateIndex = barBeginLength,
+                leftRightDistance = 0,
+                rightLabelValue =$(".rightHandle-label-value"),
+                leftLabelValue =$(".leftHandle-label-value"),
+                rightLabel = $(".rightHandle-label"),
+                leftLabel = $(".leftHandle-label"),
+                leftTimeOut = '',
+                rightTimeOut = '';
+
+            $('html').bind({
+              mousemove: function(event){
+
+                if(isMouseDown){
+                  
+                  if( handleId == 'leftHandle'){
+                    if( Math.abs(event.clientX - (parent.offset().left + _dateArr[leftDateIndex].location.x)) < _dateArr[leftDateIndex].width / 2){
+                      return;
+                    }
+                    if( event.clientX < parent.offset().left + _dateArr[leftDateIndex].location.x && _dateArr[leftDateIndex].location.x > 0){
+                      if(_dateArr[leftDateIndex].date - selectionStartDate < 24 * 3600000 || leftDateIndex == 0){
+                        return;
+                      }
+                      leftDateIndex--;
+                      renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                      
+
+                    } else if(_dateArr[leftDateIndex + 1].location.x < _dateArr[rightDateIndex].location.x){
+                      leftDateIndex++;
+                      renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                      
+                    }
+
+                    leftLabelValue.html(dateFormat(new Date(_dateArr[leftDateIndex].date)));
+                    leftLabel.fadeIn('fast');
+                    clearTimeout(leftTimeOut);
+                    leftTimeOut = setTimeout(function(){
+
+                      leftLabel.fadeOut('normal');
+                    },1000);
+                    //注释了流畅滑动
+                    // bar.css({
+                    //   left: event.clientX + 'px',
+                    //   width: bar.width() + bar.offset().left - event.clientX - 8 + "px"
+                    // });
+                    // leftHandle.css('left',event.clientX - 6 + 'px');
+
+                  } else if( handleId == 'rightHandle'){
+
+                    if( Math.abs(event.clientX - (parent.offset().left + _dateArr[rightDateIndex].location.x)) < _dateArr[rightDateIndex].width / 2){
+                      return;
+                    }
+                    if( event.clientX < (parent.offset().left + _dateArr[rightDateIndex].location.x) && _dateArr[rightDateIndex - 1].location.x > _dateArr[leftDateIndex].location.x){
+                      rightDateIndex--;
+                      renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                      
+                    } else if( _dateArr[rightDateIndex].location.x < _dateArr[dateArrLength - 1].location.x && event.clientX > (parent.offset().left + _dateArr[rightDateIndex].location.x)){
+                      if(selectionEndDate.valueOf() - _dateArr[rightDateIndex].date < 24 * 3600000){
+                        return;
+                      }
+                      rightDateIndex++;
+                      renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                      
+                    }
+
+                    rightLabelValue.html(dateFormat(new Date(_dateArr[rightDateIndex].date)));
+                    rightLabel.fadeIn('fast');
+                    clearTimeout(rightTimeOut);
+                    rightTimeOut = setTimeout(function(){
+
+                      rightLabel.fadeOut('normal');
+                    },1000);
+                    //注释了流畅滑动
+                    // bar.css('width',bar.width() + event.clientX - rightHandle.offset().left + "px");
+                    // rightHandle.css('left',event.clientX - 8 + 'px');
+
+                  } else if( handleId == 'bar'){
+
+                    if( Math.abs(event.clientX - (parent.offset().left + bar.offset().left + bardiff) + 6) < (_dateArr[leftDateIndex].width / 2) ){
+                      return;
+                    }
+                    if(event.clientX < (parent.offset().left + bar.offset().left + bardiff) &&  _dateArr[leftDateIndex].location.x > 0){
+
+                      if(leftDateIndex - 1  != -1){
+                        rightDateIndex--;
+                        leftDateIndex--;
+                        renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                        
+                      }
+
+                    } else if(_dateArr[rightDateIndex].location.x < _dateArr[dateArrLength - 1].location.x){
+                      if(selectionEndDate.valueOf() - _dateArr[rightDateIndex].date < 24 * 3600000){
+                        return;
+                      }
+                      rightDateIndex++;
+                      leftDateIndex++;
+                      renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                      
+                    }
+
+                    leftLabelValue.html(dateFormat(new Date(_dateArr[leftDateIndex].date)));
+                    rightLabelValue.html(dateFormat(new Date(_dateArr[rightDateIndex].date)));
+                    rightLabel.fadeIn('fast');
+                    leftLabel.fadeIn('fast');
+                    clearTimeout(leftTimeOut);
+                    clearTimeout(rightTimeOut);
+                    rightTimeOut = setTimeout(function(){
+                      rightLabel.fadeOut('normal');
+                    },1000);
+                    leftTimeOut = setTimeout(function(){
+                      leftLabel.fadeOut('normal');
+                    },1000);
+
+                    // isDragingBar = true;
+                    // bar.css('left' , event.clientX - bardiff + 6);
+                    // var tempBarLeft = bar.offset().left;
+                    // leftHandle.css('left' , event.clientX - bardiff + "px");
+                    // rightHandle.css('left' , event.clientX - bardiff + bar.width() + "px");
+                    // nowTime = (new Date()).valueOf();
+
+                    mouseLastLocation = event.clientX;
+                    
+                  }
+                  
+                }
+
+              },
+              mouseup: function(event){
+                if(isMouseDown){
+                  isMouseDown = false;
+                }
+                $('.arrowIsHovering').removeClass('arrowIsHovering');
+              }
+            });
+            
+            var handlerObj = {
+              mousedown: function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                isMouseDown = true;
+                // if( !mainHandle ){
+                //   mainHandle = $(event.target);
+                //   handleId = mainHandle.attr('id');
+                // }
+                handleId = $(event.target).attr('id');
+                if($(event.target).hasClass('bar-inner')){
+                  handleId = 'bar';
+                } else if($(event.target).hasClass('leftHandle-inner')){
+                  $(event.target).addClass("arrowIsHovering");
+                  handleId = 'leftHandle';
+                } else if($(event.target).hasClass('rightHandle-inner')){
+                  $(event.target).addClass("arrowIsHovering");
+                  handleId = 'rightHandle';
+                }
+
+                mouseLastLocation = event.clientX;
+                bardiff = mouseLastLocation - (parent.offset().left + bar.offset().left);
+                
+              },
+              mouseup: function(event) {
+                isMouseDown = false;
+        
+              }
+
+            }
+
+            // $("#rightHandle , #leftHandle ,#bar ,.bar-inner,.rightHandle-inner").bind(handlerObj);
+            $("#bar ,.bar-inner,.rightHandle-inner,.leftHandle-inner").bind(handlerObj);
+
+            var selectionHandler = function(event){ 
+
+              var selectValue = event.target.value,
+                  year = 0,
+                  month = 0,
+                  isYearModel = false;
+
+              if( selectValue.length > 4 ){
+                year = parseInt(selectValue.split('.')[0]);
+                month = parseInt(selectValue.split('.')[1]);
+              } else {
+                year = parseInt(selectValue);
+                isYearModel = true;
+              }
+
+              if(isYearModel){
+                _dateArr = renderRuler( new Date(year,0,1) , getMaxDay(new Date(year,11,1)) , parent ,'year');
+              } else {
+                _dateArr = renderRuler( new Date(year,month - 1,1) , getMaxDay(new Date(year,month,1)) , parent );
+              }
+              
+              dateArrLength = _dateArr.length;
+              leftDateIndex = 0;
+              rightDateIndex = barBeginLength;
+              renderBar(0 , _dateArr[barBeginLength].location.x, parent);
+              
+            }
+
+            $('#dateSelection').bind('change',selectionHandler);
+
+            var bindButtonEvent = function(event){
+              event.stopPropagation();
+              event.preventDefault();
+              leftRightDistance = rightDateIndex - leftDateIndex;
+              if($(this).attr('class').indexOf('rightArrow') !== -1){
+                
+                //处理左边界左移
+                if( leftDateIndex < leftRightDistance && $('#dateSelection').val().indexOf('.') === -1){
+
+                  leftDateIndex = 0;
+                  rightDateIndex = leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+
+                } else if( leftDateIndex < leftRightDistance){
+
+                  if(_dateArr[leftDateIndex].date - 24 * 3600000 * leftRightDistance < selectionStartDate.valueOf() ){
+                    _dateArr = renderRuler( new Date(selectionStartDate.valueOf()), new Date(_dateArr[dateArrLength - 1].date - 24 * 3600000 * ((_dateArr[leftDateIndex].date - selectionStartDate.valueOf())/(24 * 3600000) - leftDateIndex)) , parent);
+                  } else{
+                    _dateArr = renderRuler( new Date(_dateArr[leftDateIndex].date - 24 * 3600000 * leftRightDistance), new Date(_dateArr[dateArrLength - 1].date - 24 * 3600000 * (leftRightDistance - leftDateIndex)) , parent);
+                  }
+                  dateArrLength = _dateArr.length;
+                  leftDateIndex = 0;
+                  rightDateIndex = leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+
+                  //处理selection
+                  var tempValue  = $("#dateSelection").val().split(".");
+                  if(tempValue[1] > 1 && ((new Date(_dateArr[dateArrLength - 1].date)).getMonth() + 1) < tempValue[1] && $("#dateSelection")[0].selectedIndex + 1 < $("#dateSelection option").length){
+                    $("#dateSelection")[0].selectedIndex++;
+                  } else if(tempValue[1] == 1 && (new Date(_dateArr[dateArrLength - 1].date)).getFullYear() < tempValue[0] && $("#dateSelection")[0].selectedIndex + 2 < $("#dateSelection option").length){
+                    $("#dateSelection")[0].selectedIndex += 2;
+                  }
+                      
+                } else {
+
+                  rightDateIndex = leftDateIndex;
+                  leftDateIndex -= leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+
+                }
+
+              } else {
+
+                //处理右边界右移移动
+                if(rightDateIndex + leftRightDistance > dateArrLength - 1 && $('#dateSelection').val().indexOf('.') === -1){
+
+                  rightDateIndex = dateArrLength - 1;
+                  leftDateIndex = rightDateIndex - leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+
+                } else if( rightDateIndex + leftRightDistance > dateArrLength - 1){
+                  if(selectionEndDate.valueOf() < _dateArr[rightDateIndex ].date + 24 * 3600000 * leftRightDistance && selectionEndDate.valueOf() - _dateArr[rightDateIndex].date > 24 *3600000)
+                  {
+                    _dateArr = renderRuler( new Date(_dateArr[0].date + selectionEndDate.valueOf() - _dateArr[dateArrLength - 1].date), new Date(_dateArr[dateArrLength - 1].date + 24 * 3600000 * (selectionEndDate.valueOf() - _dateArr[dateArrLength - 1].date)/(24 * 3600000)) , parent );
+                  } else if(selectionEndDate.valueOf() - _dateArr[rightDateIndex].date > 24 *3600000){
+                    _dateArr = renderRuler( new Date(_dateArr[leftRightDistance].date), new Date(_dateArr[dateArrLength - 1].date + 24 * 3600 * 1000 * leftRightDistance) , parent );
+                  } else {
+                    return;
+                  }
+                  dateArrLength = _dateArr.length;
+                  rightDateIndex = dateArrLength - 1;
+                  leftDateIndex = rightDateIndex - leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+
+                  //处理selection
+                  var tempValue  = $("#dateSelection").val().split(".");
+                  if(tempValue[1] < 12 && (new Date(_dateArr[0].date)).getMonth() + 1 > tempValue[1] && $("#dateSelection")[0].selectedIndex > 0){
+                    $("#dateSelection")[0].selectedIndex-- ;
+                  } else if(tempValue[1] == 12 && (new Date(_dateArr[0].date)).getFullYear() > tempValue[0] && $("#dateSelection")[0].selectedIndex > 1){
+                    $("#dateSelection")[0].selectedIndex -= 2;
+                  }
+
+                } else if(selectionEndDate.valueOf() - _dateArr[rightDateIndex].date < (24 * 3600000 * leftRightDistance)){
+
+                  rightDateIndex += parseInt((selectionEndDate.valueOf() - _dateArr[rightDateIndex].date) / (24 * 3600000));
+                  leftDateIndex = rightDateIndex - leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                }else{
+
+                  leftDateIndex = rightDateIndex;
+                  rightDateIndex += leftRightDistance;
+                  renderBar( _dateArr[leftDateIndex].location.x , _dateArr[rightDateIndex].location.x );
+                }
+
+              }
+
+              leftLabelValue.html(dateFormat(new Date(_dateArr[leftDateIndex].date)));
+              rightLabelValue.html(dateFormat(new Date(_dateArr[rightDateIndex].date)));
+              rightLabel.fadeIn('fast');
+              leftLabel.fadeIn('fast');
+              clearTimeout(leftTimeOut);
+              clearTimeout(rightTimeOut);
+              rightTimeOut = setTimeout(function(){
+                rightLabel.fadeOut('normal');
+              },1000);
+              leftTimeOut = setTimeout(function(){
+                leftLabel.fadeOut('normal');
+              },1000);
+
+            }
+
+            $('.rightArrow ,.leftArrow').bind('click' , bindButtonEvent);
+          }
+
+          var dateFormat = function(date){
+            if(date.getMonth() + 1 < 10 ){
+              return '0' + (date.getMonth() + 1) + "." + date.getDate(); 
+            }
+            return (date.getMonth() + 1) + "." + date.getDate();
+          }
+
+          var createSelectionData = function(start,end){
+            var startYear = start.getFullYear(),
+                startMonth = start.getMonth(),
+                endYear = end.getFullYear(),
+                endMonth = end.getMonth(),
+                dateList = [];
+
+            for(var month = endMonth,year = endYear; year > startYear || (year == startYear && month >= startMonth);month--){
+              if(month == 0){
+                dateList.push({
+                  value: year + '.' + (month + 1),
+                  text: year + '.' + (month + 1)
+                });
+                dateList.push({
+                  value: year,
+                  text: year
+                });
+                year--;
+                month = 11;
+              }
+              if(year >= startYear){
+                dateList.push({
+                  value: year + '.' + (month + 1),
+                  text: year + '.' + (month + 1)
+                });
+              }
+            }
+
+            return dateList;
+          }
+          // renderScale( new Date(2014,5,6) , new Date(2014,6,7) , $("#slider") );
+
+          // dateArr = renderRuler( new Date((new Date()).getFullYear(),0,1) , new Date((new Date()).getFullYear(),11,1) , parent,'year' );
+          _dateArr = renderRuler(new Date(today.getFullYear(),today.getMonth(),1),new Date(today.getFullYear(),today.getMonth() + 1,0) , parent);
+          renderBaseLine( parent , 3 , '#8cbecd' );
+          createButton( parent );
+          createSelection( parent ,createSelectionData(selectionStartDate,selectionEndDate));
+          renderBar(1 , _dateArr[barBeginLength + 1].location.x - 1, parent);
+          bindEvent();
+        };
+
+        new timeline({
+          parent: $('#slider'),
+          selectionStartDate: new Date(2013,0,1),
+          selectionEndDate: new Date(),
+          barBeginLength: 6,
+          selectionChange: function(selectedIndex,selectionDate){
+            console.log('selectionChange!!');
+          },
+          barChange: function(beginDate,endDate){
+            console.log('beginDate:' + new Date(beginDate) + " ,endDate:" + new Date(endDate));
+          }
+        });
+      }(jQuery))
+    </script>
+  </body>
+</html>

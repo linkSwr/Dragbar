@@ -1,0 +1,288 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Range</title>
+    <link rel="stylesheet" href="style/style.css" type="text/css" />
+    <style type="text/css">
+        body{
+          background-color: #000;
+        }
+        #wrap{
+          margin-top:166px;
+        }
+        .selectionWrap{
+          position: relative;
+        }
+        .selectButton{
+          background-color: #cbe5e2;
+          box-shadow: 1px 1px 2px #004a62;
+          display: inline-block;
+          opacity: 0.8;
+          width:55px;
+          height:21px;
+          cursor: pointer;
+        }
+        .selectLabel{
+          width:35px;
+          height:21px;
+          display:inline-block;
+          float:left;
+        }
+        .selectLabel-value{
+          color:#518789;
+          font-size: 12px;
+          padding:3px 0;
+          text-align:center;
+        }
+        .selectLabel-arr-wrap{
+          width:20px;
+          height:21px;
+          display:inline-block;
+          float: left;
+        }
+        .selectLabel-arr-inner{
+          margin: 7px 6px 7px;
+          border: 4px solid transparent;
+          border-top: 0;
+          border-bottom: 5px solid #669999;
+        }
+        .selection-list-wrap{
+          background-color:rgba(140,190,205,0.45);
+          overflow: hidden;
+          display:inline-block;
+          width:55px;
+          height:144px;
+          position: absolute;
+          left:0;
+          bottom:21px;
+          display:none;
+        }
+        .selection-list{
+          position: relative;
+        }
+        .selection-list-inner{
+          position: absolute;
+          /*top:-60px;*/
+          
+        }
+        .selection-list-item{
+          font-size:12px;
+          padding:5px 12px 5px 9px;
+          color:#fff;
+        }
+        .selection-list-item:hover{
+          background-color:rgba(140,190,205,0.45);
+          cursor: pointer;
+        }
+        .selection-list-scroll{
+          height:144px;
+          width: 3px;
+          position: absolute;
+          right:0;
+          top:0;
+        }
+        .selection-list-scroll-inner{
+         
+          height:60px;
+          position: absolute;
+          top: 30px;
+          right:0px;
+          width:3px;
+          padding-left: 9px;
+          cursor: pointer;
+        }
+        .selection-list-scroll-body{
+          background-color: #669999;
+          width:3px;
+          height:60px;
+          border-radius:4px;
+
+        }
+    </style>
+  </head>
+  <body>
+     <div id="wrap">
+        <!-- <div class="selectionWrap">
+          <div class="selectButton">
+            <div class="selectLabel">
+              <div class="selectLabel-value">时间</div>
+            </div>
+            <div class="selectLabel-arr-wrap">
+              <div class="selectLabel-arr-inner"></div>
+            </div>
+          </div>
+          <div class="selection-list-wrap">
+            <div class="selection-list">
+              <div class="selection-list-inner">
+                <div class="selection-list-item" data-value="2014">2014</div>
+                <div class="selection-list-item" data-value="2014.1">2014.1</div>
+                <div class="selection-list-item" data-value="2014.2">2014.2</div>
+                <div class="selection-list-item" data-value="2014.3">2014.3</div>
+                <div class="selection-list-item" data-value="2014.4">2014.4</div>
+                <div class="selection-list-item" data-value="2014.5">2014.5</div>
+              </div>
+            </div>
+            <div class="selection-list-scroll">
+              <div class="selection-list-scroll-inner">
+                <div class="selection-list-scroll-body"></div>
+              </div>
+            </div>
+          </div>
+        </div> -->
+      </div>
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript">
+     (function($,underfined){
+       var buildSelection = function(param){
+          var parent = typeof(param.parent) == "object" ? param.parent : $('body'),
+              scrollOffset = 0,
+              selectionList = '',
+              selectionListWrap = '',
+              scrollInner = '',
+              scrollbody = '',
+              dataArr = param.dataList || '',
+              dataArrLength = dataArr.length,
+              selectionValue = '时间',
+              selectionLabel = '',
+              position = '',
+              selectionButton = '',
+              listItemShowNum = param.listItemShowNum || 6;
+
+          var createDom = function(parent){
+            var selectionStr =  '<div class="selectionWrap">' +
+                                    '<div class="selectButton">' +
+                                      '<div class="selectLabel">' +
+                                        '<div class="selectLabel-value"></div>' +
+                                      '</div>' +
+                                      '<div class="selectLabel-arr-wrap">' +
+                                        '<div class="selectLabel-arr-inner"></div>' +
+                                      '</div>' +
+                                    '</div>' +
+                                    '<div class="selection-list-wrap">' +
+                                      '<div class="selection-list">' +
+                                        '<div class="selection-list-inner">' +
+                                        '</div>' +
+                                      '</div>' +
+                                      '<div class="selection-list-scroll">' +
+                                        '<div class="selection-list-scroll-inner">' +
+                                          '<div class="selection-list-scroll-body"></div>' +
+                                        '</div>' +
+                                      '</div>' +
+                                    '</div>' +
+                                '</div>';
+                if( parent.append ){
+                  var tempNode = $(selectionStr);
+                  scrollInner = tempNode.find('.selection-list-scroll-inner');
+                  scrollBody = tempNode.find('.selection-list-scroll-body');
+                  selectionLabel = tempNode.find('.selectLabel-value');
+                  selectionList = tempNode.find('.selection-list-inner');
+                  selectionListWrap =tempNode.find('.selection-list-wrap');
+                  selectionButton = tempNode.find('.selectButton');
+                  // tempNode = null;
+                  selectionLabel.html(selectionValue);
+                  parent.append(tempNode);
+                } else {
+                  console.warm("CreateDom False!");
+                }
+          
+          }
+
+          var adddate = function(_dataArr){
+            var _dataArrLength = _dataArr.length,
+                nodeStr = '';
+            for(var index = 0; index < _dataArrLength ; index++){
+              dataArr.push(_dataArr[index]);
+              nodeStr += '<div class="selection-list-item" data-value="'+ _dataArr[index].value +'">'+ _dataArr[index].text +'</div>';
+            }
+            dataArrLength = dataArr.length;
+            selectionList.append(nodeStr);
+          }
+
+          var renderList = function(){
+            var nodeStr = '';
+            for(var index = 0; index < dataArrLength; index++){
+              nodeStr += '<div class="selection-list-item" data-value="'+ dataArr[index].value +'">'+ dataArr[index].text +'</div>';
+            }
+            selectionList.append(nodeStr);
+          }
+
+          var emptyList = function(){
+            selectionList.empty()
+          }
+
+          var resetScroll= function(){
+              console.log("resetScroll");
+          }
+
+          var buttonLabelHandler = function(){
+            return {
+              click : function(event){
+                selectionListWrap.fadeIn('fast');
+              }
+            };
+          }
+
+          var listItemHandler = function(){
+            return {
+              click: function(event){
+                selectionListWrap.fadeOut('fast');
+                selectionLabel.html(selectionValue = $(this).html());
+              }
+            };
+          }
+
+          var bindAllevent = function(){
+
+            selectionButton.bind(buttonLabelHandler());
+            selectionList.delegate('.selection-list-item',listItemHandler());
+
+          }
+          createDom(parent); 
+          renderList();
+          bindAllevent();
+       }
+
+       buildSelection({
+        parent: $('#wrap'),
+        dataList: [
+          {
+            value: '2014',
+            text: '2014'
+          },
+          {
+            value: '2014.1',
+            text: '2014.1'
+          },
+          {
+            value: '2014.2',
+            text: '2014.2'
+          },
+          {
+            value: '2014.3',
+            text: '2014.3'
+          },
+          {
+            value: '2014.4',
+            text: '2014.4'
+          },
+          {
+            value: '2014.5',
+            text: '2014.5'
+          },
+          {
+            value: '2014.6',
+            text: '2014.6'
+          },
+          {
+            value: '2014.7',
+            text: '2014.7'
+          }
+        ]
+       });
+
+     })(jQuery)
+
+    </script>
+  </body>
+</html>
