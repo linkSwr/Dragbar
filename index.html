@@ -183,19 +183,25 @@
 
         var timeline = function(param) {
 
+          //TO-DO parent？命名问题
+          //必要参数不明显
+          //回调命名应该 onBarChange 而不是 barChange
           var parent = param.parent || $('body'),
               // dateArr = [],
               _dateArr = [],
+
               barBeginLength = param.barBeginLength || 6,
               leftDateIndex = 0,
               rightDateIndex = barBeginLength,
+              //回调命名应该 onBarChange 而不是 barChange
               selectionChange = param.selectionChange || function(){},
               barChange = param.barChange || function(){},
+              //有必要建立这么多日期对象吗？
               selectionStartDate = param.selectionStartDate || new Date(),
               selectionEndDate = param.selectionEndDate || new Date(),
               today = new Date();
 
-
+          //参数名用容器 比如 container wrapper outer
           var createButton = function(parent){
             var parent = parent ? parent : $('body');
             parent.append('<div id="rangeSlider-arrow" class="rangeSlider-arrow"></div>');
@@ -222,7 +228,7 @@
               }
             }
           }
-          
+          //内部调用传颜色干啥？
           var renderBaseLine = function( parentNode , height , bgColor){
 
             parentNode.append('<div id="rangeWrap" style=" display:inline-block;width:'+ (parentNode.width() - 179) +'px;"></div>');
@@ -284,7 +290,7 @@
             }
 
             if( !model || model != 'year'){
-
+                //常量直接算出来，用全大写的变量表示
                 for( var i = start.valueOf(), sunDayIndex = 0, index = 0; i < end.valueOf() - 24 * 60 * 60 * 1000; i += 24 * 60 * 60 * 1000, index++){
         
                   if(  sunDayIndex < sundayArr.length && i == sundayArr[sunDayIndex].valueOf()){
@@ -827,6 +833,7 @@
 
           // dateArr = renderRuler( new Date((new Date()).getFullYear(),0,1) , new Date((new Date()).getFullYear(),11,1) , parent,'year' );
           _dateArr = renderRuler(new Date(today.getFullYear(),today.getMonth(),1),new Date(today.getFullYear(),today.getMonth() + 1,0) , parent);
+          //内部调用为啥要把颜色传进去？
           renderBaseLine( parent , 3 , '#8cbecd' );
           createButton( parent );
           createSelection( parent ,createSelectionData(selectionStartDate,selectionEndDate));
