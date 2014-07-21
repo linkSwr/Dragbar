@@ -1,14 +1,11 @@
  #slider{
   /*width:569px;*/
   width:748px;
-  margin-top:250px;
+  margin-top:50px;
   display: inline-block;
   float: left;
   position: relative;
   margin-left:50px;
-  -moz-user-select:none;
-  -webkit-user-select:none;
-  user-select:none; 
 }
 .sundayCircleBox{
   display:inline-block;
@@ -51,7 +48,7 @@
   padding: 0;
 }
 .arrow{
-  background: url(../image/leftRightButton.png) no-repeat;
+  background: url(image/leftRightButton.png) no-repeat;
   width: 25px;
   height: 25px;
   display: inline-block;
@@ -74,7 +71,7 @@
 }
 #selectionWrap{
   position: relative;
-/*  height:66px;*/
+  height:66px;
   padding-left:7px;
   left: 568px;
   padding-top: 0;
@@ -82,7 +79,6 @@
 }
 #selectionWrap select{
   /*position: absolute;*/
-  display: none;
   right:-60px;
 }
 .barWrap{
@@ -151,7 +147,7 @@
 .arrowIsHovering{
   width: 17px;
   height: 17px;
-  background:url(../image/red-pot.png);
+  background:url(image/red-pot.png);
   position: absolute;
   left:-3px;
   top:-3px;
@@ -169,98 +165,4 @@
   height:6px;
   top: 6px;
   left:0;
-}
-
-.selectionWrap{
-  position: relative;
-  -moz-user-select:none;
-  -webkit-user-select:none;
-  user-select:none; 
-}
-.selectButton{
-  background-color: #cbe5e2;
-  box-shadow: 1px 1px 2px #004a62;
-  display: inline-block;
-  opacity: 0.8;
-  width:65px;
-  height:21px;
-  cursor: pointer;
-}
-.selectLabel{
-  width:55px;
-  height:21px;
-  display:inline-block;
-  float:left;
-}
-.selectLabel-value{
-  color:#518789;
-  font-size: 12px;
-  padding:4px 0;
-  text-align:center;
-  height:14px;
-}
-.selectLabel-arr-wrap{
-  width:10px;
-  height:21px;
-  display:inline-block;
-  float: left;
-}
-.selectLabel-arr-inner{
-  margin: 7px 6px 7px -1px;
-  border: 4px solid transparent;
-  border-top: 0;
-  border-bottom: 5px solid #669999;
-}
-.selection-list-wrap{
-  background-color:rgba(140,190,205,0.45);
-  overflow: hidden;
-  display:inline-block;
-  width:65px;
-  height:144px;
-  position: absolute;
-  left:0;
-  /*bottom:21px;*/
-  display:none;
-}
-.selection-list{
-  position: relative;
-}
-.selection-list-inner{
-  position: absolute;
-  /*top:-60px;*/ 
-}
-.selection-list-item{
-  font-size:12px;
-  padding:5px 12px 5px 9px;
-  height:14px;
-  color:#fff;
-  cursor: pointer;
-  width:100%;
-}
-.selection-list-item-active{
-  background-color:rgba(140,190,205,0.45);
-}
-.selection-list-scroll{
-  height:144px;
-  width: 3px;
-  position: absolute;
-  right:0;
-  top:0;
-}
-.selection-list-scroll-inner{
- 
-  height:60px;
-  position: absolute;
-  /*top: 30px;*/
-  right:0px;
-  width:3px;
-  padding-left: 9px;
-  cursor: pointer;
-}
-.selection-list-scroll-body{
-  background-color: #669999;
-  width:3px;
-  height:100%;
-  border-radius:4px;
-
 }
