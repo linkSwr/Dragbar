@@ -105,6 +105,7 @@
   cursor: pointer;
   z-index: 98;
   padding: 6px 0;
+  width:100%;
 }
 .bar-inner{
   background-color: #e8d66a;
@@ -126,14 +127,23 @@
   border-radius: 6px;
   background-color: #e8d66a;
 }
+.label-wrap {
+  position: relative;
+  min-width: 100px;
+}
 .handle-label{
   background-color: #8cbecd;
   width:44px;
   height:21px;
   position: absolute;
   top:-40px;
-  left: -16px;
   border-radius: 2px;
+}
+.leftHandle-label {
+  left:-22px;
+}
+.rightHandle-label {
+  right:-22px;
 }
 .leftHandle-label-close{
   right: 0px;
@@ -141,6 +151,12 @@
 }
 .rightHandle-label-close{
   left: initial;
+}
+.leftHandle {
+  left: -6px;
+}
+.rightHandle {
+  right: -6px;
 }
 .label-triangle{
   border: 7px solid transparent;
@@ -159,7 +175,7 @@
   font-size:12px;
 }
 .handle-label{
-  display: none;
+  /*display: none;*/
 }
 .arrowIsHovering{
   width: 17px;

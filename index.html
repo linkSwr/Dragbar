@@ -3,43 +3,39 @@
   <head>
     <meta charset="utf-8"/>
     <title>Range</title>
-    <link rel="stylesheet" href="style/style.css" type="text/css" />  
+    <!-- <link rel="stylesheet" href="style/style.css" type="text/css" />  -->
+    <link rel="stylesheet" href="style/style_new.css" type="text/css" /> 
 <!--     <link rel="stylesheet" href="style/selection.css" type="text/css" />  --> 
   </head>
   <body>
-    <div id="slider1" style="margin-top:0px;"></div>
     <div id="slider"></div>
-    
+<!--     <div id="slider1"></div> -->
     <script src="js/jquery.min.js"></script>
     <script src="js/dragbar.js"></script>
+    <script src="js/dragBar_new.js"></script>
     <script>
-      (function( $ , undefined ){
+      // (function( $ , undefined ){
 
-        new dragbar({
-          dragbarContainer: $('#slider'),
-          selectionStartDate: new Date(2013,0,1),
-          selectionEndDate: new Date(),
-          barBeginLength: 6,
-          onSelectionChange: function(selectedIndex,selectionDate){
-            console.log('selectionChange!!');
-          },
-          onBarChange: function(beginDate,endDate){
-            console.log('beginDate:' + new Date(beginDate) + " ,endDate:" + new Date(endDate));
-          }
-        });
+      //   var initData = new dragbar({
+      //     parent: $('#slider'),
+      //     selectionStartDate: new Date(2011,2,1),
+      //     selectionEndDate: new Date(),
+      //     barBeginLength: 6,
+      //     selectionChange: function(selectedIndex,selectionDate){
+      //       console.log('selectionChange!!');
+      //     },
+      //     barChange: function(beginDate,endDate,renderModal){
+      //       console.log('beginDate:' + new Date(beginDate) + " ,endDate:" + new Date(endDate) + ",renderModal:" + renderModal);
+      //     }
+      //   });
+      //   console.log(initData);
+      // }(jQuery))
 
-        var oneobj = (function(){
-          return function(){
-            this.getEvent = function(){ console.log(count); }
-          }
-        })();
-        oneobj.prototype.count = 1;
-        var obj1 = new oneobj(),
-            obj2 = new oneobj();
-        console.log(obj1.count);
-        // console.log(obj2);
-
-      }(jQuery))
+      var initData = new DragBar({
+        container: $('#slider'),
+        beginTime: new Date(2011,2,1),
+        endTime: new Date(2011,3,1)
+      });
     </script>
   </body>
 </html>
