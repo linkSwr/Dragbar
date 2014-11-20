@@ -1,4 +1,4 @@
-(function(window, document, $, undefined) {
+(function(window, $, undefined) {
 
   /*
   * defined static variable
@@ -314,4 +314,4 @@
     var result = new DragBar(option);
     return {};
   };
-})(window, window.document, (jQuery || $));
+})(window, (jQuery || $));
